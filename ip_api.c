@@ -129,7 +129,7 @@ void country_handler(FCGX_Request *request){
         name = "Undefined";
 
     if(strcmp(type, "all") == 0) {
-        FCGX_FPrintF(request->out, "%s\n\%s\n%s", country_code, country_code3, name);
+        FCGX_FPrintF(request->out, "%s\n%s\n%s", country_code, country_code3, name);
     } else if(strcmp(type, "code3") == 0) {
         FCGX_PutS(country_code3, request->out);
     } else if(strcmp(type, "name") == 0) {
@@ -163,6 +163,7 @@ static void *doit(struct doit_args *thread_args) {
     FCGX_Request request;
     FCGX_InitRequest(&request, thread_args->socket, 0);
     for(;;) {
+        // on some systems this require lock
         rc = FCGX_Accept_r(&request);
         if(rc < 0) // if error then exit
             break;
