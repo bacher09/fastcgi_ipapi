@@ -44,7 +44,6 @@ struct handler {
 
 void ip_handler(FCGX_Request*);
 void user_agent_handler(FCGX_Request*);
-void mycountry_handler(FCGX_Request*);
 void country_handler(FCGX_Request*);
 
 const struct handler url_hanlders[] = {
@@ -186,7 +185,7 @@ void handle_signal(int signal) {
 }
 
 
-int Init_App(const char *socket_str) {
+void Init_App() {
     struct sigaction sa;
 
     FCGX_Init();
@@ -201,7 +200,7 @@ int Init_App(const char *socket_str) {
         goto err;
 
     atexit(Cleanup_App);
-    return FCGX_OpenSocket(socket_str, BACKLOG);
+    return;
     err:
         perror("Error setting signal handler");
         exit(1);
@@ -214,12 +213,21 @@ int main(int argc, char *argv[]) {
     pthread_t id[THREAD_COUNT];
     struct doit_args thread_args[THREAD_COUNT - 1];
 
-    if(argc != 2) {
-        perror("Wront argument count\nCall program with ./program socket\n");
+    if(argc == 2) {
+        sock_fd = FCGX_OpenSocket(argv[1], BACKLOG);
+    } else if(argc == 1) {
+        sock_fd = 0; // use precreated socket
+    } else {
+        perror("Wront argument count\nCall program with ./program socket or ./program\n");
         return 1;
     }
 
-    sock_fd = Init_App(argv[1]);
+    if(sock_fd < 0) {
+        perror("Error opening socket\n");
+        return 1;
+    }
+
+    Init_App();
     thread_args[0].thread_num = 0;
     thread_args[0].socket = sock_fd;
     for(int i = 1; i < THREAD_COUNT; i++) {
