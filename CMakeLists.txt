@@ -3,6 +3,8 @@ project(ip_api)
 SET(SOURCE_ROOT "${PROJECT_SOURCE_DIR}/src")
 aux_source_directory( ${SOURCE_ROOT} SOURCES )
 
+option(WITH_IPV6 "Support for ipv6 addresses" ON)
+
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Default build type is: Release")
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
@@ -10,13 +12,20 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
                                             "MinSizeRel" "RelWithDebInfo")
 endif()
 
+configure_file(
+    "${SOURCE_ROOT}/config.h.in"
+    "${PROJECT_BINARY_DIR}/config.h"
+    )
+
+include_directories("${PROJECT_BINARY_DIR}")
+
 if(NOT MSVC)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -Wall -D_POSIX_C_SOURCE=200809L")
 endif()
 
 if(APPLE)
-    INCLUDE_DIRECTORIES("/opt/local/include")
-    LINK_DIRECTORIES("/opt/local/lib")
+    include_directories("/opt/local/include")
+    link_directories("/opt/local/lib")
 endif()
 
 set(NAME ${PROJECT_NAME})

@@ -9,23 +9,30 @@
 #include <string.h>
 
 static GeoIP *geoip_country;
+#ifdef WITH_IPV6
 static GeoIP *geoip_country_v6;
+#endif
 
 
 void Geoip_Init(){
 
+#ifdef WITH_IPV6
     if(!GeoIP_db_avail(GEOIP_COUNTRY_EDITION) ||
        !GeoIP_db_avail(GEOIP_COUNTRY_EDITION_V6))
+#else
+    if(!GeoIP_db_avail(GEOIP_COUNTRY_EDITION))
+#endif
         goto err;
 
     geoip_country = GeoIP_open_type(GEOIP_COUNTRY_EDITION, GEOIP_MEMORY_CACHE);
     if(geoip_country == NULL)
         goto err;
 
+#ifdef WITH_IPV6
     geoip_country_v6 = GeoIP_open_type(GEOIP_COUNTRY_EDITION_V6, GEOIP_INDEX_CACHE);
-
     if(geoip_country_v6 == NULL)
         goto err;
+#endif
 
     return;
 
@@ -37,7 +44,9 @@ void Geoip_Init(){
 
 void Geoip_Cleanup() {
     GeoIP_delete(geoip_country);
+#ifdef WITH_IPV6
     GeoIP_delete(geoip_country_v6);
+#endif
 }
 
 AddrType get_addr_family(const char *address) {
@@ -67,8 +76,10 @@ int lookup_country_id(const char *ip_address) {
 
     if(type == IP_V4)
         return GeoIP_id_by_addr(geoip_country, ip_address);
+#ifdef WITH_IPV6
     else if(type == IP_V6)
         return GeoIP_id_by_addr_v6(geoip_country_v6, ip_address);
+#endif
     else
         return -1;
 }
