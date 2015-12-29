@@ -6,7 +6,7 @@ database and some additional services. It written in C.
 ## API Calls
 
 | Path                             |  Result                                                             |
----------------------------------------------------------------------------------------------------------|
+| -------------------------------- | ------------------------------------------------------------------- |
 | /ip                              | Returns your current ip                                             |
 | /user-agent                      | Returns user-agent of your web-client                               |
 | /country                         | Returns 2 digit country code of your ip                             |
