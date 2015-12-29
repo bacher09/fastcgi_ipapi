@@ -4,6 +4,8 @@ SET(SOURCE_ROOT "${PROJECT_SOURCE_DIR}/src")
 aux_source_directory( ${SOURCE_ROOT} SOURCES )
 
 option(WITH_IPV6 "Support for ipv6 addresses" ON)
+set(WORKERS 4 CACHE STRING "Workers count")
+set_property(CACHE WORKERS PROPERTY STRINGS 2 4 6 7 8 9 10 11 12 13 14 16)
 
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Default build type is: Release")

@@ -1,5 +1,6 @@
 #include "geoip_api.h"
 #include "http_utils.h"
+#include "config.h"
 
 #include "fcgi_config.h"
 #include "fcgiapp.h"
@@ -13,7 +14,6 @@
 #include <unistd.h>
 #include <stdbool.h>
 
-#define THREAD_COUNT 4
 #define BACKLOG 16
 #define MAX_KEY 40
 #define MAX_VALUE 300
