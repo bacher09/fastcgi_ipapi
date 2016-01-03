@@ -84,7 +84,7 @@ void country_handler(FCGX_Request *request){
     query_param qp;
     int country_id;
     int i = 0;
-    const char *country_code, *country_code3, *name;
+    const char *country_code, *country_code3, *name, *xon_code;
     char *query_string = FCGX_GetParam("QUERY_STRING", request->envp);
 
     qp.key = key;
@@ -116,11 +116,15 @@ void country_handler(FCGX_Request *request){
     country_id = lookup_country_id(ip);
     FCGX_PutS("Content-Type: text/plain\r\n\r\n", request->out);
     country_code = country_code_by_id(country_id);
-    if(country_code == NULL)
+    if (country_code == NULL) {
         country_code = "Undefined";
+        xon_code = "--";
+    } else {
+        xon_code = country_code;
+    }
 
     country_code3 = country_code3_by_id(country_id);
-    if(country_code3 == NULL)
+    if (country_code3 == NULL)
         country_code3 = "Undefined";
 
     name = country_name_by_id(country_id);
@@ -133,6 +137,8 @@ void country_handler(FCGX_Request *request){
         FCGX_PutS(country_code3, request->out);
     } else if(strcmp(type, "name") == 0) {
         FCGX_PutS(name, request->out);
+    } else if(strcmp(type, "xonotic") == 0) {
+        FCGX_FPrintF(request->out, "%s %s", xon_code, ip);
     } else {
         FCGX_PutS(country_code, request->out);
     }
