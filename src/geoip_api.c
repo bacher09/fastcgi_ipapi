@@ -1,3 +1,4 @@
+#include "config.h"
 #include "geoip_api.h"
 
 #include "GeoIP.h"
