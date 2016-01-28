@@ -14,6 +14,10 @@
 #include <unistd.h>
 #include <stdbool.h>
 
+#if(__STDC_VERSION__ >= 20112L)
+#include <stdnoreturn.h>
+#endif
+
 #define BACKLOG 16
 #define MAX_KEY 40
 #define MAX_VALUE 300
@@ -187,7 +191,7 @@ void Cleanup_App(){
 }
 
 void handle_signal(int signal) {
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
 
 
@@ -209,31 +213,54 @@ void Init_App() {
     return;
     err:
         perror("Error setting signal handler");
-        exit(1);
+        exit(EXIT_FAILURE);
+}
+
+#if(__STDC_VERSION__ >= 20112L)
+static noreturn void usage()
+#else
+static void usage()
+#endif
+{
+    fputs("Usage: prog [-s socket-path] [-c chrootdir]\n", stderr);
+    exit(EXIT_FAILURE);
 }
 
 
 
 int main(int argc, char *argv[]) {
-    int sock_fd;
+    int sock_fd, opt;
+    const char *chroot_dir = NULL;
     pthread_t id[THREAD_COUNT];
     struct doit_args thread_args[THREAD_COUNT - 1];
+    sock_fd = 0;
 
-    if(argc == 2) {
-        sock_fd = FCGX_OpenSocket(argv[1], BACKLOG);
-    } else if(argc == 1) {
-        sock_fd = 0; // use precreated socket
-    } else {
-        perror("Wront argument count\nCall program with ./program socket or ./program\n");
-        return 1;
+    while ((opt = getopt(argc, argv, "s:c:")) != -1) {
+        switch (opt) {
+            case 's':
+                sock_fd = FCGX_OpenSocket(optarg, BACKLOG);
+                break;
+            case 'c':
+                chroot_dir = optarg;
+                break;
+            default:
+                usage(); // no return
+        }
     }
 
     if(sock_fd < 0) {
         perror("Error opening socket\n");
-        return 1;
+        return EXIT_FAILURE;
     }
 
     Init_App();
+
+    if (chroot_dir != NULL) {
+        if (chdir(chroot_dir) != 0 || chroot(chroot_dir) != 0) {
+            perror("Failed to chroot");
+            exit(EXIT_FAILURE);
+        }
+    }
     thread_args[0].thread_num = 0;
     thread_args[0].socket = sock_fd;
     for(int i = 1; i < THREAD_COUNT; i++) {

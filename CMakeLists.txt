@@ -22,7 +22,7 @@ configure_file(
 include_directories("${PROJECT_BINARY_DIR}")
 
 if(NOT MSVC)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -Wall -D_POSIX_C_SOURCE=200809L")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -Wall -D_POSIX_C_SOURCE=200809L -D_BSD_SOURCE")
 endif()
 
 if(APPLE)
