@@ -2,6 +2,7 @@
 #define CONFIG_H
 
 #cmakedefine WITH_IPV6
+#cmakedefine WITH_CHROOT
 #define THREAD_COUNT @WORKERS@
 
 #endif

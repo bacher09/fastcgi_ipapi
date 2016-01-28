@@ -18,6 +18,12 @@
 #include <stdnoreturn.h>
 #endif
 
+#ifdef WITH_CHROOT
+#define USAGE_STRING "Usage: prog [-s socket-path] [-c chrootdir]"
+#else
+#define USAGE_STRING "Usage: prog [-s socket-path]"
+#endif
+
 #define BACKLOG 16
 #define MAX_KEY 40
 #define MAX_VALUE 300
@@ -222,7 +228,7 @@ static noreturn void usage()
 static void usage()
 #endif
 {
-    fputs("Usage: prog [-s socket-path] [-c chrootdir]\n", stderr);
+    fputs(USAGE_STRING "\n", stderr);
     exit(EXIT_FAILURE);
 }
 
@@ -230,7 +236,9 @@ static void usage()
 
 int main(int argc, char *argv[]) {
     int sock_fd, opt;
+#ifdef WITH_CHROOT
     const char *chroot_dir = NULL;
+#endif
     pthread_t id[THREAD_COUNT];
     struct doit_args thread_args[THREAD_COUNT - 1];
     sock_fd = 0;
@@ -240,9 +248,11 @@ int main(int argc, char *argv[]) {
             case 's':
                 sock_fd = FCGX_OpenSocket(optarg, BACKLOG);
                 break;
+#ifdef WITH_CHROOT
             case 'c':
                 chroot_dir = optarg;
                 break;
+#endif
             default:
                 usage(); // no return
         }
@@ -255,12 +265,14 @@ int main(int argc, char *argv[]) {
 
     Init_App();
 
+#ifdef WITH_CHROOT
     if (chroot_dir != NULL) {
         if (chdir(chroot_dir) != 0 || chroot(chroot_dir) != 0) {
             perror("Failed to chroot");
             exit(EXIT_FAILURE);
         }
     }
+#endif
     thread_args[0].thread_num = 0;
     thread_args[0].socket = sock_fd;
     for(int i = 1; i < THREAD_COUNT; i++) {

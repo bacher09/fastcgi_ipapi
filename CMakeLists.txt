@@ -4,6 +4,7 @@ SET(SOURCE_ROOT "${PROJECT_SOURCE_DIR}/src")
 aux_source_directory( ${SOURCE_ROOT} SOURCES )
 
 option(WITH_IPV6 "Support for ipv6 addresses" ON)
+option(WITH_CHROOT "Support for chroot call" ON)
 set(WORKERS 4 CACHE STRING "Workers count")
 set_property(CACHE WORKERS PROPERTY STRINGS 2 4 6 7 8 9 10 11 12 13 14 16)
 
@@ -22,7 +23,11 @@ configure_file(
 include_directories("${PROJECT_BINARY_DIR}")
 
 if(NOT MSVC)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -Wall -D_POSIX_C_SOURCE=200809L -D_BSD_SOURCE")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -Wall -D_POSIX_C_SOURCE=200809L")
+
+    if(WITH_CHROOT)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_BSD_SOURCE")
+    endif()
 endif()
 
 if(APPLE)
