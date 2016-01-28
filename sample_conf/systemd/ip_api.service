@@ -1,0 +1,16 @@
+[Unit]
+Description=ip_api service
+
+[Service]
+Type=simple
+ExecStart=/srv/www/ip_api/ip_api -c /srv/www/ip_api/chroot
+User=someuser
+Group=someuser
+StandardInput=socket
+StandardError=syslog
+Restart=always
+KillSignal=SIGTERM
+CapabilityBoundingSet=CAP_SYS_CHROOT
+PrivateTmp=yes
+PrivateNetwork=yes
+ProtectHome=yes

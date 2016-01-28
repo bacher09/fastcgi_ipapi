@@ -1,0 +1,12 @@
+[Unit]
+Description=ip_api fastcgi unix socket
+
+[Socket]
+ListenStream=/run/fastcgi-ipapi.sock
+SocketUser=www-data
+SocketGroup=www-data
+SocketMode=0600
+Accept=false
+
+[Install]
+WantedBy=sockets.target
