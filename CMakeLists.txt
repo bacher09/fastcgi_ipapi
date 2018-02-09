@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 3.2)
 project(ip_api)
 SET(SOURCE_ROOT "${PROJECT_SOURCE_DIR}/src")
 aux_source_directory( ${SOURCE_ROOT} SOURCES )
@@ -26,7 +26,7 @@ if(NOT MSVC)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -Wall -D_POSIX_C_SOURCE=200809L")
 
     if(WITH_CHROOT)
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_BSD_SOURCE")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_DEFAULT_SOURCE")
     endif()
 endif()
 
