@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ip-address-api
+  labels:
+    app: ip-address-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ip-address-api
+  template:
+    metadata:
+      labels:
+        app: ip-address-api
+    spec:
+      containers:
+      - name: fastcgi-ipapi
+        image: bacher09/fastcgi_ipapi
+        ports:
+        - containerPort: 8080
+          protocol: "TCP"
+        resources:
+          requests:
+            cpu: 0.1
+            memory: "64Mi"
+          limits:
+            cpu: 0.3
+            memory: "128Mi"
+        readinessProbe:
+          timeoutSeconds: 2
+          httpGet:
+            path: /country?ip=8.8.8.8
+            port: 8080
+        livenessProbe:
+          timeoutSeconds: 2
+          httpGet:
+            path: /country?ip=8.8.8.8
+            port: 8080
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: ip-address-api
+spec:
+  selector:
+    app: ip-address-api
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
